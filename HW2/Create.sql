@@ -1,1 +1,194 @@
-Create.sqlQueries for create schema:create table person(    -> id int not null auto_increment primary key,    -> phone_person_generalization int,    -> foreign key(phone_person_generalization) references phone(id),    -> address_person_generalization int,     -> foreign key(address_person_generalization) references Address(id),    -> firstName varchar(100),    -> lastName varchar(100),    -> userName varchar(100),    -> password varchar(100),    -> email varchar(100),     -> dob date);     alter table phone add column `primary` boolean not null default 0;alter table address add column `primary` boolean not null default 0;mysql> create table user(    -> id int primary key references person(id),    -> userAgreement bool);create table developer(    -> id int primary key references person(id),    -> developerKey varchar(100)     -> );     Create table widget(> id int auto_increment primary key,> name varchar(100),> width int,> height int,> cssClass varchar(100),> cssStyle varchar(100),> text varchar(100),> order int;create table heading(    -> id int primary key references widget(id),     -> size int);          create table html(    -> id int primary key references widget(id),     -> html varchar(100));create table image(    -> id int primary key references widget(id),       -> src varchar(100));     create table youtube(    -> id int primary key references widget(id),    -> url varchar(100),    -> shareble boolean,     -> expandable boolean);create table page( id int auto_increment primary key, title varchar(100),widget_page_generalization int, d description varchar(100), created date, updated date, visits int);create table website(    -> id int auto_increment primary key,    -> name varchar(100),    -> page_website_generalization int,    -> foreign key(page_website_generalization) references page(id),    -> created date,    -> updated date,     -> visits int);create table single_table(                                                                      ->  website_id int auto_increment primary key,    -> name varchar(100),    -> page_id int,    -> page_desc varchar(100),    -> widget_id int,    -> widget_name varchar(100),    -> dtypes varchar(100)    -> );create table phone( id int not null auto_increment primary key, phone varchar(100));create table address(    -> id int not null auto_increment primary key,    -> street1 varchar(100),    -> street2 varchar(100),    -> city varchar(100),    -> state varchar(100),     -> zip varchar(100));     create table websiteRole(    -> id int auto_increment primary key,    -> webRole_website_generalization int,    ->  foreign key(webRole_website_generalization) references website(id),     -> webRole_developer_generalization int,    -> foreign key(webRole_developer_generalization) references developer(id)     -> role enum('owner','admin','writer','editor','reviewer'));create table website_priviliage(    -> id int auto_increment primary key,    -> web_priviliage_website_generalization int,    -> foreign key(web_priviliage_website_generalization) references website(id),     -> web_priviliage_developer_generalization int,     -> foreign key(web_priviliage_developer_generalization) references developer(id)     ->privilidge enum('create','read','update','delete')     -> );     create table pagePriviliage(    -> id int auto_increment primary key,    -> page_priviliage_page_generalization int,    -> foreign key(page_priviliage_page_generalization) references page(id),     -> page_priviliage_developer_generalization int,    -> foreign key(page_priviliage_developer_generalization) references developer(id),     -> role enum('create','read','update','delete'));     create table pageRole(    -> id int auto_increment primary key,    -> page_role_page_generalization int,    -> foreign key(page_role_page_generalization) references page(id),     -> page_role_developer_generalization int,    -> foreign key(page_role_developer_generalization) references developer(id),    -> role enum('owner','admin','writer','editor','reviewer'));    
+
+	CREATE TABLE person (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		first_name VARCHAR(250) NOT NULL, 
+		last_name VARCHAR(250) NOT NULL,
+		username VARCHAR(250) NOT NULL,
+		password VARCHAR(250) NOT NULL,
+		email VARCHAR(250),
+		dob DATE
+	);
+	
+
+
+	CREATE TABLE user (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		person INT(8),
+		user_agreement BOOL
+	);
+	
+
+	ALTER TABLE user ADD CONSTRAINT user_person_generalization 
+	    FOREIGN KEY (person) REFERENCES person(id);
+			
+	
+
+	
+	CREATE TABLE developer (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		person INT(8),
+		developer_key VARCHAR(250)
+	);
+	
+
+	ALTER TABLE developer ADD CONSTRAINT developer_person_generalization 
+	    FOREIGN KEY (person) REFERENCES person(id);
+			
+	
+
+
+	CREATE TABLE website (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		developer INT(8),
+		name VARCHAR(250) NOT NULL,
+		description VARCHAR(250),
+		created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		visits INT(8) DEFAULT 0
+	);
+	
+
+	ALTER TABLE website ADD CONSTRAINT website_developer_aggregation
+	    FOREIGN KEY (developer) REFERENCES developer(id);
+			
+
+	CREATE TABLE page (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		website INT(8),
+		title VARCHAR(250) NOT NULL,
+		description VARCHAR(250),
+		created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		views INT(8) DEFAULT 0
+	);
+	
+
+	ALTER TABLE page ADD CONSTRAINT page_website_composition
+	    FOREIGN KEY (website) REFERENCES website(id)
+			ON DELETE CASCADE;
+			
+	
+	CREATE TABLE widget (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		page INT(8),
+		name VARCHAR(250) NOT NULL,
+		width INT(8),
+		height INT(8),
+		css_class VARCHAR(250),
+		css_style VARCHAR(250),
+		text VARCHAR(250),
+		widget_order INT(8),
+		dtype VARCHAR(250) NOT NULL,
+		youtube_url VARCHAR(250),
+		youtube_shareble BOOL,
+		youtube_expandable BOOL,
+		image_src VARCHAR(25),
+		heading_size INT(8) DEFAULT 2,
+		html_html VARCHAR(25)
+	);
+	
+
+	ALTER TABLE widget
+	ADD CONSTRAINT widget_page_composition
+	FOREIGN KEY (`page`) REFERENCES page (id)
+	ON DELETE CASCADE;
+			
+
+	CREATE TABLE phone (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		person INT(8),
+		phone VARCHAR(25) NOT NULL,
+		phone_primary BOOL
+	);
+	
+
+	ALTER TABLE phone ADD CONSTRAINT phone_person_composition
+	    FOREIGN KEY (person) REFERENCES person(id);
+			
+	 
+	CREATE TABLE address (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		person INT(8),
+		street1 VARCHAR(250),
+		street2 VARCHAR(250),
+		city VARCHAR(250),
+		state VARCHAR(250),
+		zip VARCHAR(250),
+		address_primary BOOL
+	);
+	
+
+	ALTER TABLE address ADD CONSTRAINT address_person_composition
+	    FOREIGN KEY (person) REFERENCES person(id);
+			
+	
+	CREATE TABLE role (
+		name VARCHAR(250) NOT NULL DEFAULT '',
+	 PRIMARY KEY (name)	
+	);
+	
+
+	
+	CREATE TABLE priviledge (
+		name VARCHAR(250) NOT NULL DEFAULT '',
+		PRIMARY KEY(name)
+	);
+	
+
+			
+	CREATE TABLE website_role (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		role VARCHAR(250) DEFAULT NULL,
+		developer INT(8),
+		website INT(8),
+		FOREIGN KEY (role) REFERENCES role (name),
+		FOREIGN KEY (developer) REFERENCES developer (id),
+		FOREIGN KEY (website) REFERENCES website (id) ON DELETE CASCADE;
+	);
+			
+	CREATE TABLE website_priviledge (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		priviledge VARCHAR(250) DEFAULT NULL,
+		developer INT(8),
+		website INT(8),
+		FOREIGN KEY (priviledge) REFERENCES priviledge (name),
+		FOREIGN KEY (developer) REFERENCES developer (id),
+		FOREIGN KEY (website) REFERENCES website (id) ON DELETE CASCADE
+	);
+	
+
+	
+	CREATE TABLE page_role (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		role VARCHAR(250) DEFAULT NULL,
+		developer INT(8),
+		page INT(8),
+		FOREIGN KEY (role) REFERENCES role (name),
+		FOREIGN KEY (developer) REFERENCES developer (id),
+		FOREIGN KEY (page) REFERENCES page (id) ON DELETE CASCADE
+	);
+	
+
+	CREATE TABLE page_priviledge (
+		id INT(8) NOT NULL  PRIMARY KEY AUTO_INCREMENT,   
+		priviledge VARCHAR(250) DEFAULT NULL,
+		developer INT(8),
+		page INT(8),
+		FOREIGN KEY (priviledge) REFERENCES priviledge (name),
+		FOREIGN KEY (developer) REFERENCES developer (id),
+		FOREIGN KEY (page) REFERENCES page (id)
+	);
+
+
+	insert into priviledge(name) values ('create');
+	insert into priviledge(name) values ('read');
+	insert into priviledge(name) values ('update');
+	insert into priviledge(name) values ('delete');
+
+
+	insert into role(name) values ('owner');
+	insert into role(name) values ('admin');
+	insert into role(name) values ('writer');
+	insert into role(name) values ('editor');
+	insert into role(name) values ('reviewer');
+	
