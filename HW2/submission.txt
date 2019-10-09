@@ -1,0 +1,1 @@
+As a deliverable, Please fill the details in the “Submission.txt”. Failing to do so will not allow us to review your submission. Key items to submit are:* the hostname: cs5200-fall2018-tang* username:xinyu_tang* password:CS2020er..* port:cs5200-fall2018-tang.c1iy3op9i59h.us-east-2.rds.amazonaws.com
