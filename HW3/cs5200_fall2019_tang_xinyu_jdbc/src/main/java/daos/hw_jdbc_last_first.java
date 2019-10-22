@@ -1,75 +1,178 @@
 package daos;
 
-import edu.northeastern.cs5200.DAO;
-import models.Developer;
-import models.Widget;
+import java.sql.SQLException;
+import java.util.List;
+
+import models.*;
+
 
 public class hw_jdbc_last_first {
-	public static void main(String[] args) {
-		DeveloperDaolmpl dao = new DeveloperDaolmpl();
-		WebsiteDaolmpl web = new WebsiteDaolmpl();
-		WidgetDaolmpl wid = new WidgetDaolmpl();
-		PageDaolmpl pag = new PageDaolmpl();
-		
-		//insert into developer
-		dao.createDeveloper(12,"4321rewq",1, "Alice", "Wonder", "alice","alice","alice@wonder.com");
-		dao.createDeveloper(23,"5432trew",2, "Bob", "Merley","bob","bob","bob@marley.com");
-		dao.createDeveloper(34,"6543ytre",3, "Charles", "Garcia","charles","charles","chuch@garcia.com");
-		dao.createDeveloper(45,"7654fda",4, "Dan", "Martin","dan","dan","dan@martin.com");
-		dao.createDeveloper(56,"7654fda",5, "Dan", "Martin","dan","dan","dan@martin.com");
-		
-		
-		//insert into Website
-		web.createWebsiteForDeveloper(123,"Facebook",
-				"an online social media and social networking service","","",1234234,0);
-		
-		web.createWebsiteForDeveloper(234,"Twitter",
-				"an online news and social networking service" + 
-				"","","",4321543,1);
-		web.createWebsiteForDeveloper(345,"Wikipedia",
-				"a free online encyclopedia","","",3456654,2);
-		web.createWebsiteForDeveloper(456,"CNN",
-				"an American basic cable and satellite elevision news channel","","",6543345,3);
-		web.createWebsiteForDeveloper(567,"CNET",
-				"an American meida website that publishes reveiws, news, artilces, blog on consumer electronincs"
-				,"","",5433455,4);
-		web.createWebsiteForDeveloper(678,"Gizmodo",
-				"a design, technology, science and fiction website that also writes articles on politics","","",4322345,5);
-		
-		//insert into pages
-		pag.createPageForWebsite(1,123, "Home",
-				"Landing page","","",123434);
-		pag.createPageForWebsite(2,234, "About",
-				"Website description","","",234545);
-		pag.createPageForWebsite(3,345, "Contact",
-				"Addresses, phones, and contact info","","",345656);
-		pag.createPageForWebsite(4,456, "Preference",
-				"Where users can confiture their preference","","",456776);
-		pag.createPageForWebsite(5,567, "Profile",
-				"User can configure theri personal information","","",457878);
-		
-		//insert widget
-		wid.createWidgetForPage(1, "head123", 0, 0,"", "",
-				"Welcome", 0, 1);
-		wid.createWidgetForPage(1, "post234", 0, 0,"", "",
-				"<p>Lorem</p>" + 
-				"", 0, 1);
-		wid.createWidgetForPage(1, "head345", 0, 0,"", "",
-				"Hi", 0, 1);
-		wid.createWidgetForPage(1, "intro456", 0, 0,"", "",
-				"<h1>HI<Hi>", 0, 1);
-		wid.createWidgetForPage(1, "image345", 50, 100,"", "",
-				"", 0, 1);
-		wid.createWidgetForPage(1, "video456", 400, 300,"", "",
-				"", 0, 1);
+	private DeveloperDao developerDao = new DeveloperDaolmpl();
+    private WebsiteDao websiteDao = new WebsiteDaolmpl();
+    private PageDao pageDao = new PageDaolmpl();
+    private WidgetDao widgetDao = new WidgetDaolmpl();
+    private RoleDao roleDao = new Rolelmpl();
+    
+    public void insertDevelopers() throws SQLException, ClassNotFoundException {
+        Developer developer = new Developer(12,"4321rewq","Alice","Wonder","alice","alice", "alice@wonder.com");
+        developerDao.createDeveloper(developer);
+        developer = new Developer(23,"5432trew","Bob","Marley","bob","bob","bon@marley.com");
+        developerDao.createDeveloper(developer);
+        developer = new Developer(34,"6543ytre","Charlie","Garcia","charlie","charlie","chuch@garcia.com");
+        developerDao.createDeveloper(developer);
+    }
 
-		
-		//delete
-		dao.deleteDeveloper(12);
-		wid.deleteWidget(12);
-		pag.deletePage(345);
-		web.deleteWebsite(123);
-		web.deleteWebsite(567);
-	}
+    public void insertWebsites() throws SQLException, ClassNotFoundException {
+        Website web = new Website(123,"Facebook", "an online social media and social networking service",null,null,1234234);
+        websiteDao.createWebsiteForDeveloper(12, web);
+
+        web = new Website(234,"Twitter","an online news and social networking service",null,null,4321543);
+        websiteDao.createWebsiteForDeveloper(23, web);
+        web = new Website(345,"Wikipedia","a free online encyclopedia",null,null,3456654);
+        websiteDao.createWebsiteForDeveloper(34, web);
+        web = new Website(456,"CNN","an American basic cable and satellite television news channel",null,null,6543345);
+        websiteDao.createWebsiteForDeveloper(12, web);
+        web = new Website(567,"CNET", "an American media website that publishes reviews, news, articles, blogs, podcasts and videos on technology and consumer electronics",null,null,5433455);
+        websiteDao.createWebsiteForDeveloper(23, web);
+        web = new Website(678,"Gizmodo","a design, technology, science and science fiction website that also writes articles on politics",null,null,4322345);
+        websiteDao.createWebsiteForDeveloper(34, web);
+    }
+
+    public void insertPages() throws SQLException, ClassNotFoundException {
+        Page page = new Page(123,"Home","Landing page",null,null,123434);
+        pageDao.createPageForWebsite(567, page);
+        page = new Page(234,"About","Website description",null,null,234545);
+        pageDao.createPageForWebsite(678, page);
+        page = new Page(345,"Contact","Addresses, phones, and contact info",null,null,345656);
+        pageDao.createPageForWebsite(345, page);
+        page = new Page(456,"Preferences","Where users can configure their preferences",null,null,456776);
+        pageDao.createPageForWebsite(456, page);
+        page = new Page(567,"Profile","Users can configure their personal information",null,null,567878);
+        pageDao.createPageForWebsite(567, page);
+    }
+
+    public void insertWidgets() throws SQLException, ClassNotFoundException {
+        Widget widget = new Widget(1,"head123",-1,-1,"","","Welcome",0);
+        widgetDao.createWidgetForPage(123, widget);
+
+        widget = new Widget(2,"post234",-1,-1,"","","<p>Lorem</p>",0);
+        widgetDao.createWidgetForPage(234, widget);
+
+        widget = new Widget(3,"head345",-1,-1,"","","Hi",1);
+        widgetDao.createWidgetForPage(345, widget);
+
+        widget = new Widget(4,"intro456",-1,-1,"","","<h1>Hi</h1>",2);
+        widgetDao.createWidgetForPage(345, widget);
+
+        widget = new Widget(5,"image345",50,100,"","","",3);
+        widgetDao.createWidgetForPage(345, widget);
+
+        widget = new Widget(6,"video456",400,300,"","","",0);
+        widgetDao.createWidgetForPage(456, widget);
+    }
+
+    public void insetRoles() throws SQLException, ClassNotFoundException {
+
+        RoleDao RoleDao = new Rolelmpl();
+        roleDao.assignWebsiteRole(12, 123, Role.owner.name());
+        roleDao.assignWebsiteRole(23, 123, Role.editor.name());
+        roleDao.assignWebsiteRole(34, 123, Role.admin.name());
+        roleDao.assignWebsiteRole(23, 234, Role.owner.name());
+        roleDao.assignWebsiteRole(34, 234, Role.editor.name());
+        roleDao.assignWebsiteRole(12, 234, Role.admin.name());
+        roleDao.assignWebsiteRole(34, 345, Role.owner.name());
+        roleDao.assignWebsiteRole(12, 345, Role.editor.name());
+        roleDao.assignWebsiteRole(23, 345, Role.admin.name());
+        roleDao.assignWebsiteRole(12, 456, Role.owner.name());
+        roleDao.assignWebsiteRole(23, 456, Role.editor.name());
+        roleDao.assignWebsiteRole(34, 456, Role.admin.name());
+        roleDao.assignWebsiteRole(23, 567, Role.owner.name());
+        roleDao.assignWebsiteRole(34, 567, Role.editor.name());
+        roleDao.assignWebsiteRole(12, 567, Role.admin.name());
+        roleDao.assignWebsiteRole(34, 678, Role.owner.name());
+        roleDao.assignWebsiteRole(12, 678, Role.editor.name());
+        roleDao.assignWebsiteRole(23, 678, Role.admin.name());
+
+        // insert page roles
+        roleDao.assignPageRole(12, 123, Role.editor.name());
+        roleDao.assignPageRole(23, 123, Role.reviewer.name());
+        roleDao.assignPageRole(34, 123, Role.writer.name());
+        roleDao.assignPageRole(23, 234, Role.editor.name());
+        roleDao.assignPageRole(34, 234, Role.reviewer.name());
+        roleDao.assignPageRole(12, 234, Role.writer.name());
+        roleDao.assignPageRole(34, 345, Role.editor.name());
+        roleDao.assignPageRole(12, 345, Role.reviewer.name());
+        roleDao.assignPageRole(23, 345, Role.writer.name());
+        roleDao.assignPageRole(12, 456, Role.editor.name());
+        roleDao.assignPageRole(23, 456, Role.reviewer.name());
+        roleDao.assignPageRole(34, 456, Role.writer.name());
+        roleDao.assignPageRole(23, 567, Role.editor.name());
+        roleDao.assignPageRole(34, 567, Role.reviewer.name());
+        roleDao.assignPageRole(12, 567, Role.writer.name());
+    }
+
+   
+    public void updateDeleloper() throws ClassNotFoundException, SQLException {
+        Developer developer = developerDao.findDeveloperByUsername("Charlie");
+        for (Phone phone : developer.getPerson().getPhones()) {
+            if (phone.isPrimary()) {
+                phone.setPhone("333-444-5555");
+               
+            }
+        }
+
+        developerDao.updateDeveloper(developer.getId(), developer);
+    }
+    
+    public void updateWidget() throws SQLException, ClassNotFoundException {
+        Widget head345 = widgetDao.findWidgetById(3);
+        head345.setOrder(3);
+        widgetDao.updateWidget(3, head345);
+
+        Widget intro456 = widgetDao.findWidgetById(4);
+        intro456.setOrder(4);
+        widgetDao.updateWidget(4, intro456);
+
+        Widget image345 = widgetDao.findWidgetById(5);
+        image345.setOrder(5);
+        widgetDao.updateWidget(5, image345);
+    }
+    
+    public void updatePage() throws SQLException, ClassNotFoundException {
+        for (Page page : pageDao.findPagesForWebsite(567)) {
+            String title = page.getTitle();
+            page.setTitle("CNET - " + title);
+            page.setWebsiteId(567);
+            pageDao.updatePage(page.getId(), page);
+        }
+    }
+
+    // Swap Charlie's and Bob's role in CNET's Home page
+    public void updateRole() throws SQLException, ClassNotFoundException {
+        roleDao.deletePageRole(34, 123, Role.writer.name());
+        roleDao.deletePageRole(23, 123, Role.reviewer.name());
+        roleDao.assignPageRole(34, 123, Role.reviewer.name());
+        roleDao.assignPageRole(23, 123, Role.writer.name());
+    }
+
+    // Delete Alice's primary address
+    public void deleteDeveloper() throws SQLException, ClassNotFoundException {
+        Developer developer = developerDao.findDeveloperByUsername("Alice");
+        Person person = developer.getPerson();
+        List<Address> addresses = person.getAddresses();
+        int deleteIndex = -1;
+        for(int i = 0; i < addresses.size(); i++) {
+            if (addresses.get(i).isPrimary()) {
+                deleteIndex = i;
+                break;
+            }
+        }
+
+        addresses.remove(deleteIndex);
+
+        developerDao.updateDeveloper(developer.getId(), developer);
+    }
+
+	
 	
 }

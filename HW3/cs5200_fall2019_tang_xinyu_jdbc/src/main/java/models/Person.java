@@ -1,51 +1,87 @@
 package models;
+import java.sql.Date;
+import java.util.List;
 
 public class Person {
 	private int id;
-	private String first_name;
-	private String last_name;
-	private String user_name;
-	private String created;
-	private String password;
-	private String email;
-	private String date;
+    private String firstName = "peng"; // default values
+    private String lastName = "tong";
+    private String username = "tp";
+    private String password = "1234";
+    private String email = "ptong@gmail.com";
+    private Date dob;
+    private List<Phone> phones;
+    private List<Address> addresses;
 
-	
-	public Person(int id,String first_name,String last_name,String user_name,
-			String created,String password,String email,String date) {
-		
-		this.id =id;
-		this.first_name= first_name;
-		this.last_name =last_name;
-		this.user_name=user_name;
-		this.created = created;
-		this.password =password;
-		this.email = email;
-		this.date = date;
-	}
-	
-	public void setFirstName(String first_name) {
-		this.first_name= first_name;
-	}
-	public void setLastName(String last_name) {
-		this.last_name =last_name;
-		
-	}
-	public void setUserName(String user_name) {
-		this.user_name=user_name;	
-	}
-	public void setPassword(String password) {
-		this.password =password;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public void setDate(String date) {
-		this.date=date;	
-	}
+    public int getId() {
+        return id;
+    }
 
-	public int getID() {
-		return id;
-	}
-	
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Date getDob() {
+        return dob;
+    }
+
+    public void setDob(Date dob) {
+        this.dob = dob;
+    }
+
+    public List<Phone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(Phone phone) {
+        this.phones = phone;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(Address address) {
+        this.addresses = address;
+    }
 }

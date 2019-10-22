@@ -1,5 +1,6 @@
 package daos;
-
+import java.sql.Date;
+import java.util.List;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,37 +8,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import models.Developer;
 
 import edu.northeastern.cs5200.DB_connection;
 import models.Page;
 import models.Website;
 
-public class WebsiteDaolmpl {
+public class WebsiteDaolmpl implements WebsiteDao{
 	
 	DB_connection obj_DB_connection = new DB_connection();
 	Connection connection = obj_DB_connection.get_connection(); 
 	
-	public void createWebsiteForDeveloper(int id,String name,String description,String created,String updated,
-			int visits, int developer_id) {
+	public void createWebsiteForDeveloper(int developerId, Website website) {
 		
 		try {
 			
-			String q = "insert into Website(id,description,name, created,updated,visits,developer_id)"
-					+"values(?,?,?,?,?,?,?)";	
+			String q = "insert into website (id, developer, name, description, created, updated, visits) values (?,?,?,?,?,?,?)";	
 			PreparedStatement ps = connection.prepareStatement(q);
 		
 			
-			ps.setInt(1,id);
-			ps.setString(2,name);
-			ps.setString(3,description);
-			ps.setString(4,created);
-			ps.setString(5,updated);
-			ps.setInt(6,visits);
-			ps.setInt(7,developer_id);
-	
-		
-			ps.execute();
+			ps.setInt(1, website.getId());
+	        ps.setInt(2, developerId);
+	        ps.setString(3, website.getName());
+	        ps.setString(4, website.getDescription());
+	        ps.setDate(5, website.getCreated());
+	        ps.setDate(6, website.getUpdated());
+	        ps.setInt(7, website.getVisits());
+
+	        ps.executeUpdate();
 			ps.close();
 
 			
@@ -48,26 +47,27 @@ public class WebsiteDaolmpl {
 			
 		
 	}
+	
 	public Website findWebsiteById(int websiteId) {
 		
-try {
+		try {
 			
 			String q = "select * from Website where id =" +websiteId;	
 			PreparedStatement ps = connection.prepareStatement(q);
             ResultSet rs = ps.executeQuery(q);
           	rs.next();
-          	
-			String description = rs.getString("description");
-			String name = rs.getString("name");
-			String created = rs.getString("created");
-			String updated =rs.getString("updated");
-			int visits = rs.getInt("visits");
-			int developer_id = rs.getInt("developer_id");
+          	int id = rs.getInt("id");
+          	String name = rs.getString("name");
+            String description = rs.getString("description");
+            Date created = rs.getDate("created");
+            Date updated = rs.getDate("updated");
+            int visits = rs.getInt("visits");
+
+            Website web = new Website(id, name, description, created, updated, visits);
 
 			ps.execute();
-			ps.close();
+			return web;
 			
-			return new Website(this,websiteId,name,description,created,updated,visits, null, developer_id);
 			}catch(SQLException e) {
 				System.out.println(e);
 			}
@@ -75,27 +75,30 @@ try {
 		
 	}
 	
-	//Q2
-	public Website findAllWebsites(int id) {
+
+	public Collection<Website> findAllWebsites() {
 		try {
+			List<Website> webs = new ArrayList<Website>();
 			
-			String q = "select * from Websites where id =" +id;	
+			String q = "select * from Websites";	
 			PreparedStatement ps = connection.prepareStatement(q);
-            ResultSet rs = ps.executeQuery(q);
-          	rs.next();
-          	
-          	String description = rs.getString("description");
-          	String name = rs.getString("name");
-			String created = rs.getString("created");
-			String updated =rs.getString("updated");
-			int visits = rs.getInt("visits");
-			int developer_id = rs.getInt("developer_id");
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                int developerId = rs.getInt("developer");
+                String name = rs.getString("name");
+                String description = rs.getString("description");
+                Date created = rs.getDate("created");
+                Date updated = rs.getDate("updated");
+                int visits = rs.getInt("visits");
+
+                Website web = new Website(id, name, description, created, updated, visits);
+                webs.add(web);
+            }
+
+            return webs;
 			
-			
-			ps.execute();
-			ps.close();
-			
-			return new Website(this,id,name,description,created,updated,visits, null, developer_id);
 			
 			}catch(SQLException e) {
 				System.out.println(e);
@@ -104,61 +107,46 @@ try {
 		
 	}
 	
-		public Collection<Website> findAllWebsites(){
-			try {
-			String q = "select * from Website";
-			PreparedStatement ps = connection.prepareStatement(q);
-	        ResultSet rs = ps.executeQuery(q);
-	        Collection<Website> es = new ArrayList<Website>();
-	        
-	        while(rs.next()) {
-	        	int id = rs.getInt("id");
-	        	es.add(findAllWebsites(id));
-	        	ps.execute();
-				ps.close();
-	        }
-			return es;
-			}catch(SQLException e) {
-				System.out.println(e);
-			}return null;
-	   	
-		}
 		
 		public Collection<Website> findWebsitesForDeveloper(int developer_id){
 			try {
 			String q = "select * from Website where developer_id =" + developer_id;
 			PreparedStatement ps = connection.prepareStatement(q);
 	        ResultSet rs = ps.executeQuery(q);
-	        Collection<Website> es = new ArrayList<Website>();
+	        Collection<Website> webs = new ArrayList<Website>();
 	        
 	        while(rs.next()) {
 	        	int id = rs.getInt("id");
-	        	es.add(findAllWebsites(id));
-	        	ps.execute();
-				ps.close();
+	            String name = rs.getString("name");
+	            String description = rs.getString("description");
+	            Date created = rs.getDate("created");
+	            Date updated = rs.getDate("updated");
+	            int visits = rs.getInt("visits");
+
+	            Website web = new Website(id, name, description, created, updated, visits);
+	            webs.add(web);
 	        }
-			return es;
+	        
+			return webs;
+			
 			}catch(SQLException e) {
 				System.out.println(e);
 			}return null;
 	   	
 		}
 		
-		public int updateWebsite(int id,String description,String name, String created,String updated,
-				int visits, int developer_id) {
+		public int updateWebsite(int websiteId, Website website) {
 			try {
 				
-				String q = "update Website set name=?,description=?, created=?, updated=?,visits=?,"
-						+ "id=" + id;
+				String q = "UPDATE website SET id=?, developer=?, name=?, description=?, visits=? WHERE id=" + websiteId;
 				
 				PreparedStatement ps = connection.prepareStatement(q);
 				
-				ps.setString(1,name);
-				ps.setString(2,description);
-				ps.setString(3,created);
-				ps.setString(4,updated);
-				ps.setInt(5,visits);
-				ps.setInt(6,developer_id);
+				ps.setInt(1, website.getId());
+			    ps.setInt(2, website.getDeveloperId());
+			    ps.setString(3, website.getName());
+			    ps.setString(4, website.getDescription());
+			    ps.setInt(5, website.getVisits());
 				
 
 				return ps.executeUpdate();
@@ -184,7 +172,6 @@ try {
 				}return 0;
 			
 		}
-
 
 		
 	

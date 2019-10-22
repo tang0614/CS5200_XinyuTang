@@ -3,17 +3,22 @@ import java.util.Collection;
 
 import models.Developer;
 
-public interface DeveloperDao {
-	
-	public void createDeveloper(int developer_id,String k,int id, String first_name, String last_name,
-			String user_name,String password,String email);
-	public Developer findAllDevelopers(int developer_id);
-	public Developer findAllDeveloperByUserName(String user_name);
-	public Developer findAllDeveloperByCredential(String user_name,String password);
-	public Collection<Developer> findAllDevelopers();
-	public int updateDeveloper(int developer_id,String k,int id, String first_name, String last_name,
-			String user_name,String password,String email);
-	public int deleteDeveloper(int developer_id);
-		
-}
+import java.sql.SQLException;
+import java.util.Collection;
 
+
+public interface DeveloperDao {
+    void createDeveloper(Developer developer) throws SQLException, ClassNotFoundException;
+
+    Collection<Developer> findAllDevelopers() throws SQLException, ClassNotFoundException;
+
+    Developer findDeveloperById(int developerId) throws SQLException, ClassNotFoundException;
+
+    Developer findDeveloperByUsername(String username) throws SQLException, ClassNotFoundException;
+
+    Developer findDeveloperByCredentials(String username, String password) throws SQLException, ClassNotFoundException;
+
+    int updateDeveloper(int developerId, Developer developer) throws SQLException, ClassNotFoundException;
+
+    int deleteDeveloper(int developerId) throws SQLException, ClassNotFoundException;
+}

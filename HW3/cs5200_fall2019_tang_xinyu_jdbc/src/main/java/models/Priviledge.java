@@ -1,6 +1,5 @@
 package models;
 
-public class Priviledge {
-	private int id;
-
+public enum Priviledge {
+    create, read, update, delete;
 }

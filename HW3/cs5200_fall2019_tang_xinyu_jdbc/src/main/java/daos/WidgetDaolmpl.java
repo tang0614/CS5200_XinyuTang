@@ -1,4 +1,9 @@
+
 package daos;
+import java.sql.Date;
+import java.util.List;
+
+import edu.northeastern.cs5200.DB_connection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,41 +11,39 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import edu.northeastern.cs5200.DB_connection;
-import models.Website;
 import models.Widget;
+import models.WidgetType;
 
-public class WidgetDaolmpl {
+
+
+public class WidgetDaolmpl implements WidgetDao{
 
 	DB_connection obj_DB_connection = new DB_connection();
 	Connection connection = obj_DB_connection.get_connection(); 
 	
-	public void createWidgetForPage(int id, String name, int width, int height,String cssClass, String cssStyle,
-			String text, int order, int page_id) {
+	public void createWidgetForPage(int pageId, Widget widget) {
 		
 		try {
 			
-			String q = "insert into Website(id,name,width,height,visits,cssClass,cssStyle,"
-					+ "text,order,page_id"
-					+"values(?,?,?,?,?,?,?,?,?,?)";	
+			String q = "insert into widget (id, page, name, width, height, css_class, css_style, text, widget_order," +
+	                " dtype) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";	
 			
 			PreparedStatement ps = connection.prepareStatement(q);
 		
 
-			ps.setInt(1,id);
-			ps.setString(2,name);
-			ps.setInt(3,width);
-			ps.setInt(4,height);
-			ps.setString(5,cssClass);
-			ps.setString(6,cssStyle);
-			ps.setString(7,text);
-			ps.setInt(8,order);
-			ps.setInt(9,page_id);
-	
-		
-			ps.execute();
-			ps.close();
+			ps.setInt(1, widget.getId());
+	        ps.setInt(2, pageId);
+	        ps.setString(3, widget.getName());
+	        ps.setInt(4, widget.getWidth());
+	        ps.setInt(5, widget.getHeight());
+	        ps.setString(6, widget.getCssClass());
+	        ps.setString(7, widget.getCssStyle());
+	        ps.setString(8, widget.getText());
+	        ps.setInt(9, widget.getOrder());
+	        ps.setString(10, widget.getType().name());
+	        
+
+	        ps.executeUpdate();
 
 			
 			}
@@ -52,28 +55,29 @@ public class WidgetDaolmpl {
 	}
 	
 	public Widget findWidgetById(int widgetId) {
+		String q = "select * from widget where id=" + widgetId;
+		
 		
 		try {
-			
-			String q = "select * from Widget where id =" + widgetId;	
 			PreparedStatement ps = connection.prepareStatement(q);
-            ResultSet rs = ps.executeQuery(q);
-          	rs.next();
-        
-    
-			String name = rs.getString("name");
-			int width = rs.getInt("width");
-			int height =rs.getInt("height");
-			String cssClass= rs.getString("cssClass");
-			String cssStyle= rs.getString("cssStyle");
-			String text = rs.getString("text");
-			int order  = rs.getInt("order");
-			int page_id = rs.getInt("page_id");
+	        ResultSet rs = ps.executeQuery();
+			int id = rs.getInt("id");
+	        int pageId = rs.getInt("page");
+	        int width = rs.getInt("width");
+	        int height = rs.getInt("height");
+	        int order = rs.getInt("widget_order");
+	        String name = rs.getString("name");
+	   
+	        String cssClass = rs.getString("css_class");
+	        String cssStyle = rs.getString("css_style");
+	        String text = rs.getString("text");
+	        WidgetType type = WidgetType.valueOf(rs.getString("dtype"));
+	       
 
-			ps.execute();
-			ps.close();
+	        Widget widget = new Widget(id, name, width, height, cssStyle, cssClass,text,order);
+	        widget.setPageId(pageId);
 			
-			return new Widget(this, widgetId, name, width, height, cssClass, cssStyle,text,order, page_id);
+			return widget;
 			}catch(SQLException e) {
 				
 				System.out.println(e);
@@ -82,28 +86,38 @@ public class WidgetDaolmpl {
 		
 	}
 	
-	public Widget findAllWidget(int id) {
+	public Collection<Widget> findAllWidgets() {
+		List<Widget> widgets = new ArrayList<Widget>();
+		String q = "select * from widget";
+		
+
 		try {
-			
-			String q = "select * from Widget where id =" +id;	
 			PreparedStatement ps = connection.prepareStatement(q);
-            ResultSet rs = ps.executeQuery(q);
-          	rs.next();
-          	
-          	String name = rs.getString("name");
-			int width = rs.getInt("width");
-			int height =rs.getInt("height");
-			String cssClass= rs.getString("cssClass");
-			String cssStyle= rs.getString("cssStyle");
-			String text = rs.getString("text");
-			int order  = rs.getInt("order");
-			int page_id = rs.getInt("page_id");
+	        ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+	            int id = rs.getInt("id");
+	            int pageId = rs.getInt("page");
+	            int width = rs.getInt("width");
+	            int height = rs.getInt("height");
+	            int order = rs.getInt("widget_order");
+	            
+	            String name = rs.getString("name");
+	            String cssClass = rs.getString("css_class");
+	            String cssStyle = rs.getString("css_style");
+	            String text = rs.getString("text");
+	         
+	            WidgetType type = WidgetType.valueOf(rs.getString("dtype"));
+	           
+
+	            Widget widget = new Widget(id, name, width, height, cssStyle, cssClass,
+	                    text, order);
+	            widget.setPageId(pageId);
+	            widgets.add(widget);
+
+	           
+	        }
 			
-			
-			ps.execute();
-			ps.close();
-			
-			return new Widget(this,id, name, width, height, cssClass, cssStyle,text,order, page_id);
+			return widgets;
 			
 			}catch(SQLException e) {
 				System.out.println(e);
@@ -112,67 +126,61 @@ public class WidgetDaolmpl {
 		
 	}
 	
-	public Collection<Widget> findAllWigets(){
-		try {
-		String q = "select * from Widgets";
-		PreparedStatement ps = connection.prepareStatement(q);
-        ResultSet rs = ps.executeQuery(q);
-        Collection<Widget> es = new ArrayList<Widget>();
-        
-        while(rs.next()) {
-        	int id = rs.getInt("id");
-        	es.add(findAllWidget(id));
-        	ps.execute();
-			ps.close();
-        }
-		return es;
-		}catch(SQLException e) {
-			System.out.println(e);
-		}return null;
-   	
-	}
 	
 	public Collection<Widget> findWidgetsForPage(int page_id){
 		try {
 		String q = "select * from Widget where page_id =" + page_id;
 		PreparedStatement ps = connection.prepareStatement(q);
         ResultSet rs = ps.executeQuery(q);
-        Collection<Widget> es = new ArrayList<Widget>();
+        Collection<Widget> widgets = new ArrayList<Widget>();
         
-        while(rs.next()) {
-        	int id = rs.getInt("id");
-        	es.add(findAllWidget(id));
-        	ps.execute();
-			ps.close();
+        while (rs.next()) {
+            int id = rs.getInt("id");
+            String name = rs.getString("name");
+            int width = rs.getInt("width");
+            int height = rs.getInt("height");
+            String cssClass = rs.getString("css_class");
+            String cssStyle = rs.getString("css_style");
+            String text = rs.getString("text");
+            int order = rs.getInt("widget_order");
+            WidgetType type = WidgetType.valueOf(rs.getString("dtype"));
+            
+
+            Widget widget = new Widget(id, name, width, height, cssStyle, cssClass,
+                    text, order);
+            widget.setPageId(page_id);
+            widgets.add(widget);
+		
         }
-		return es;
+		return  widgets;
 		}catch(SQLException e) {
 			System.out.println(e);
 		}return null;
    	
 	}
 	
-	public int updateWidget(int id, String name, int width, int height,String cssClass, String cssStyle,
-			String text, int order, int page_id) {
+	public int updateWidget(int widgetId, Widget widget) {
 		try {
 			
-			String q = "update Widget set name=?, width=?, height=?,cssClass=?,cssStyle=?,text=?,order=?,page_id=?"
-					+ "id=" + id;
+			String q = "UPDATE widget SET id=?, page=?, name=?, width=?, height=?, css_class=?, css_style=?, text=?, widget_order=?," +
+                    "dtype=? WHERE id=" + widgetId;
 			
 			PreparedStatement ps = connection.prepareStatement(q);
 			
 
-			ps.setString(1,name);
-			ps.setInt(2,width);
-			ps.setInt(3,height);
-			ps.setString(4,cssClass);
-			ps.setString(5,cssStyle);
-			ps.setString(6,text);
-			ps.setInt(7,order);
-			ps.setInt(8,page_id);
-			
+			ps.setInt(1, widget.getId());
+	        ps.setInt(2, widget.getPageId());
+	        ps.setString(3, widget.getName());
+	        ps.setInt(4, widget.getWidth());
+	        ps.setInt(5, widget.getHeight());
+	        ps.setString(6, widget.getCssClass());
+	        ps.setString(7, widget.getCssStyle());
+	        ps.setString(8, widget.getText());
+	        ps.setInt(9, widget.getOrder());
+	        ps.setString(10, widget.getType().name());
 
-			return ps.executeUpdate();
+
+	        return ps.executeUpdate();
 			}
 			catch(SQLException e) {
 				System.out.println(e);

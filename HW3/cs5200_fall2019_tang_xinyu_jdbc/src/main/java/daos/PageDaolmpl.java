@@ -1,47 +1,42 @@
 package daos;
 
+import edu.northeastern.cs5200.DB_connection;
+import java.sql.Date;
+import java.util.List;
 import java.sql.Connection;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import edu.northeastern.cs5200.DB_connection;
 import models.Page;
-import models.Website;
 
-public class PageDaolmpl {
+
+public class PageDaolmpl implements PageDao{
 	
 	DB_connection obj_DB_connection = new DB_connection();
 	Connection connection = obj_DB_connection.get_connection(); 
 	
-	public void createPageForWebsite(int websiteId, int page_id, String page_title,
-String page_description,String page_created,String page_updated,int page_views)
+	public void createPageForWebsite(int websiteId, Page page)
  {
 		
 		try {
 			
-			String q = "insert into Website(websiteId, page_id, page_title,page_description" + 
-					"page_created,page_updated,page_views)"
-					+"values(?,?,?,?,?,?,?)";	
+			String q = "insert into page (id, website, title, description, created, updated, views) values (?,?,?,?,?,?,?)";	
 			
 		
 			PreparedStatement ps = connection.prepareStatement(q);
 		
 			
-			ps.setInt(1,websiteId);
-			ps.setInt(2,page_id);
-			ps.setString(3,page_title);
-			ps.setString(4,page_description);
-			ps.setString(5,page_created);
-			ps.setString(6,page_updated);
-			ps.setInt(7,page_views);
-	
+			ps.setInt(1, page.getId());
+	        ps.setInt(2, websiteId);
+	        ps.setString(3, page.getTitle());
+	        ps.setString(4, page.getDescription());
+	        ps.setDate(5, page.getCreated());
+	        ps.setDate(6, page.getUpdated());
+	        ps.setInt(7, page.getViews());
 		
-			ps.execute();
-			ps.close();
+	        ps.executeUpdate();
 
 			
 			}
@@ -60,47 +55,19 @@ String page_description,String page_created,String page_updated,int page_views)
             ResultSet rs = ps.executeQuery(q);
           	rs.next();
           	
-			String page_description = rs.getString("page_description");
-			String page_title = rs.getString("page_title");
-			String page_created =rs.getString("page_created");
-			String page_updated =rs.getString("page_updated");
-			int page_views = rs.getInt("page_views");
-			int websiteId = rs.getInt("websiteId");
+          	int id = rs.getInt("id");
+            String title = rs.getString("title");
+            String description = rs.getString("description");
+            Date created = rs.getDate("created");
+            Date updated = rs.getDate("updated");
+            int views = rs.getInt("views");
 
-			ps.execute();
-			ps.close();
+            Page page = new Page(id, title, description, created, updated, views);
+
+           
+            return page;
 			
-			return new Page(this, pageId, page_title,page_description,page_created,page_updated
-					,page_views, websiteId);
-			}catch(SQLException e) {
-				System.out.println(e);
-			}
-		return null;
-		
-	}
 	
-	public Page findAllPage(int id) {
-		try {
-			
-			String q = "select * from Page where page_id =" +id;	
-			PreparedStatement ps = connection.prepareStatement(q);
-            ResultSet rs = ps.executeQuery(q);
-          	rs.next();
-          	
-          	String page_description = rs.getString("page_description");
-			String page_title = rs.getString("page_title");
-			String page_created =rs.getString("page_created");
-			String page_updated =rs.getString("page_updated");
-			int page_views = rs.getInt("page_views");
-			int websiteId = rs.getInt("websiteId");
-			
-			
-			ps.execute();
-			ps.close();
-			
-			return new Page(this, id, page_title,page_description,page_created,page_updated
-					,page_views, websiteId);
-			
 			}catch(SQLException e) {
 				System.out.println(e);
 			}
@@ -110,64 +77,81 @@ String page_description,String page_created,String page_updated,int page_views)
 	
 	public Collection<Page> findAllPages(){
 		try {
-		String q = "select * from Page";
-		PreparedStatement ps = connection.prepareStatement(q);
-        ResultSet rs = ps.executeQuery(q);
-        Collection<Page> es = new ArrayList<Page>();
-        
-        while(rs.next()) {
-        	int id = rs.getInt("id");
-        	es.add(findAllPage(id));
-        	
-        	ps.execute();
-			ps.close();
-        }
-		return es;
-		}catch(SQLException e) {
-			System.out.println(e);
-		}return null;
-   	
+			List<Page> pages = new ArrayList<Page>();
+			String q = "select * from Page" ;	
+			PreparedStatement ps = connection.prepareStatement(q);
+            ResultSet rs = ps.executeQuery(q);
+          	rs.next();
+          	
+          	 while (rs.next()) {
+                 int id = rs.getInt("id");
+                 int websiteId = rs.getInt("website");
+                 String title = rs.getString("title");
+                 String description = rs.getString("description");
+                 Date created = rs.getDate("created");
+                 Date updated = rs.getDate("updated");
+                 int views = rs.getInt("views");
+
+
+                 Page page = new Page(id, title, description, created, updated, views);
+                 page.setWebsiteId(websiteId);
+                 pages.add(page);
+
+             }
+			
+          	return pages;
+			
+			}catch(SQLException e) {
+				System.out.println(e);
+			}
+		return null;
+		
 	}
+	
+	
 	
 	public Collection<Page> findPagesForWebsite(int websiteId){
 		try {
 			String q = "select * from Website where web_id =" + websiteId;
 			PreparedStatement ps = connection.prepareStatement(q);
 	        ResultSet rs = ps.executeQuery(q);
-	        Collection<Page> es = new ArrayList<Page>();
+	        Collection<Page> pages = new ArrayList<Page>();
 	        
-	        while(rs.next()) {
-	        	int id = rs.getInt("id");
-	        	es.add(findAllPage(id));
-	        	ps.execute();
-				ps.close();
+	        while (rs.next()) {
+	            int id = rs.getInt("id");
+	            String title = rs.getString("title");
+	            String description = rs.getString("description");
+	            Date created = rs.getDate("created");
+	            Date updated = rs.getDate("updated");
+	            int views = rs.getInt("views");
+
+	            Page page = new Page(id, title, description, created, updated, views);
+	            pages.add(page);
+
 	        }
-			return es;
+
+	        return pages;
 			}catch(SQLException e) {
 				System.out.println(e);
 			}return null;
 	}
 			
-	public int updatePage(int websiteId, int page_id, String page_title,
-			String page_description,String page_created,String page_updated,int page_views) {
+	public int updatePage(int pageId, Page page) {
 		
 		try {
 			
-			String q = "update Page set page_title=?, page_description=?, page_created=?,page_updated=?,"
-					+ "page_views=?,websiteId=?, page_id=" + page_id;
+			String q = "UPDATE page SET id=?, website=?, title=?, description=?, views=? WHERE id=" + pageId;
 			
 			PreparedStatement ps = connection.prepareStatement(q);
+			ps.setInt(1, page.getId());
+	        ps.setInt(2, page.getWebsiteId());
+	        ps.setString(3, page.getTitle());
+	        ps.setString(4, page.getDescription());
+	        ps.setInt(5, page.getViews());
+
+	        return ps.executeUpdate();
 			
-		
-			ps.setString(1,page_title);
-			ps.setString(2,page_description);
-			ps.setString(3,page_created);
-			ps.setString(4,page_updated);
-			ps.setInt(5,page_views);
-			ps.setInt(6,websiteId);
-	
-				
-			return ps.executeUpdate();
+			
 			}
 			catch(SQLException e) {
 				System.out.println(e);
